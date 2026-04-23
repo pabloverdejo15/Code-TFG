@@ -53,8 +53,25 @@ spl_autoload_register(function ($class_name) {
 });
 
 // Enrutamiento básico
-$controller = isset($_GET['controller']) ? $_GET['controller'] : 'Auth';
-$action = isset($_GET['action']) ? $_GET['action'] : 'login';
+$controller = isset($_GET['controller']) ? $_GET['controller'] : null;
+$action = isset($_GET['action']) ? $_GET['action'] : null;
+
+// Redirigir a usuarios logueados que intentan acceder a la landing o login
+if (isset($_SESSION['user_id'])) {
+    if (!$controller || $controller === 'Welcome' || ($controller === 'Auth' && $action !== 'logout')) {
+        header("Location: " . BASE_URL . "?controller=Community&action=index&" . SID);
+        exit;
+    }
+}
+
+if (!$controller) {
+    $controller = 'Welcome';
+    $action = 'index';
+} elseif ($controller === 'Auth' && !$action) {
+    $action = 'login';
+} elseif (!$action) {
+    $action = 'index';
+}
 
 $controllerName = $controller . 'Controller';
 

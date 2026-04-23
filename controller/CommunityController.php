@@ -12,19 +12,30 @@ class CommunityController {
     }
 
     public function index() {
-        // ... (unchanged)
         $user_id = $_SESSION['user_id'];
-        $user = (new User())->findById($user_id); // Para modal perfil
+        $user = (new User())->findById($user_id);
+        
         $database = new Database();
         $db = $database->getConnection();
-        // ...
+        
         $query = "SELECT c.*, uc.rol FROM comunidades c 
                   JOIN usuario_comunidad uc ON c.id_comunidad = uc.id_comunidad 
                   WHERE uc.id_usuario = :user_id";
         $stmt = $db->prepare($query);
         $stmt->bindParam(':user_id', $user_id);
         $stmt->execute();
-        $communities = $stmt->fetchAll(PDO::FETCH_ASSOC);
+        $all_communities = $stmt->fetchAll(PDO::FETCH_ASSOC);
+        
+        $admin_communities = [];
+        $member_communities = [];
+        
+        foreach ($all_communities as $comm) {
+            if ($comm['rol'] == 'admin') {
+                $admin_communities[] = $comm;
+            } else {
+                $member_communities[] = $comm;
+            }
+        }
 
         require_once 'view/community/index.php';
     }

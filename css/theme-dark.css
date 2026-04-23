@@ -1,0 +1,74 @@
+/* theme-dark.css - Scoped dark theme overrides for specific screens */
+
+:root {
+    --c-primary: #0055FF;
+    --c-primary-hover: #0044CC;
+    --c-secondary: rgba(0, 85, 255, 0.1);
+    --c-bg-app: #000000;
+    --c-bg-card: rgba(20, 20, 20, 0.6);
+    --c-text-main: #ffffff;
+    --c-text-muted: #a0a0a0;
+    --c-border: rgba(255, 255, 255, 0.1);
+}
+
+body, .l-app {
+    background-color: var(--c-bg-app) !important;
+    color: var(--c-text-main) !important;
+}
+
+.l-app__main {
+    background:
+        radial-gradient(circle at 20% 20%, rgba(0, 122, 255, 0.08), transparent 40%),
+        radial-gradient(circle at 80% 80%, rgba(168, 85, 247, 0.06), transparent 40%),
+        var(--c-bg-app) !important;
+    background-size: 200% 200% !important;
+    color: var(--c-text-main) !important;
+    animation: floatGlow 15s ease-in-out infinite alternate;
+}
+
+@keyframes floatGlow {
+    0% {
+        background-position: 0% 0%;
+    }
+    100% {
+        background-position: 100% 100%;
+    }
+}
+
+.l-app__sidebar, .l-app__header, .l-app__context {
+    background: rgba(10, 10, 10, 0.6) !important;
+    backdrop-filter: blur(20px) !important;
+    -webkit-backdrop-filter: blur(20px) !important;
+    border-color: var(--c-border) !important;
+}
+
+.notice-card, .glass-card {
+    background: var(--c-bg-card) !important;
+    backdrop-filter: blur(20px) !important;
+    -webkit-backdrop-filter: blur(20px) !important;
+    border: 1px solid var(--c-border) !important;
+    color: var(--c-text-main) !important;
+}
+
+.input {
+    background-color: rgba(0, 0, 0, 0.3) !important;
+    border-color: var(--c-border) !important;
+    color: var(--c-text-main) !important;
+}
+
+.btn-sidebar:hover {
+    background: rgba(255, 255, 255, 0.05) !important;
+    color: var(--c-text-main) !important;
+}
+
+/* Modals */
+.modal-overlay {
+    background: rgba(0, 0, 0, 0.8) !important;
+    backdrop-filter: blur(5px) !important;
+}
+
+.modal-content {
+    background: var(--c-bg-card) !important;
+    backdrop-filter: blur(30px) !important;
+    border: 1px solid var(--c-border) !important;
+}

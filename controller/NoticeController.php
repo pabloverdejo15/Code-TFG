@@ -52,10 +52,20 @@ class NoticeController {
             if (!isset($_POST['community_id'])) die("Falta ID comunidad");
             
             $community_id = $_POST['community_id'];
+            $user_id = $_SESSION['user_id'];
             
-            // Verificar permisos (Opcional: solo vecinos? O cualquiera en la comu?)
-            // Asumimos que si estás en la vista ya verificaste, pero doble check es bueno.
-            // Por simplicidad y consistencia, permitimos a todos crear avisos (como en la vista)
+            // Verificar permisos de admin
+            $db = (new Database())->getConnection();
+            $query = "SELECT rol FROM usuario_comunidad WHERE id_usuario = :uid AND id_comunidad = :cid";
+            $stmt = $db->prepare($query);
+            $stmt->bindParam(':uid', $user_id);
+            $stmt->bindParam(':cid', $community_id);
+            $stmt->execute();
+            $membership = $stmt->fetch(PDO::FETCH_ASSOC);
+
+            if (!$membership || $membership['rol'] !== 'admin') {
+                die("Acceso denegado. Solo administradores pueden crear avisos.");
+            }
             
             $notice = new Notice();
             $notice->id_comunidad = $community_id;

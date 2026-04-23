@@ -1,0 +1,152 @@
+/* ==========================================================================
+   Base & Tokens (BEM + Variables)
+   ========================================================================== */
+
+:root {
+    /* Colors - Brand */
+    --c-primary: #4F46E5;
+    --c-primary-hover: #4338CA;
+    --c-secondary: #E0E7FF;
+    /* Lavender */
+    --c-accent: #0D9488;
+
+    /* Colors - Backgrounds & Surfaces */
+    --c-bg-app: #F6F8FA;
+    /* Premium cool-grey canvas */
+    --c-bg-card: #FFFFFF;
+    --c-bg-chat-self: #4F46E5;
+    --c-bg-chat-other: #FFFFFF;
+
+    /* Colors - Text */
+    --c-text-main: #111827;
+    --c-text-muted: #6B7280;
+    --c-text-chat-self: #FFFFFF;
+    --c-text-chat-other: #111827;
+
+    /* Colors - State & UI */
+    --c-border: #E5E7EB;
+    --c-input-ring: rgba(224, 231, 255, 0.8);
+    /* Lavender ring */
+    --c-error: #EF4444;
+
+    /* Typography */
+    --font-main: 'Inter', -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+    --fs-xs: 0.75rem;
+    --fs-sm: 0.875rem;
+    --fs-base: 1rem;
+    /* Bumping base font size to 16px */
+    --fs-md: 1.125rem;
+    --fs-lg: 1.25rem;
+    --fs-xl: 1.75rem;
+    --lh-relaxed: 1.6;
+    --lh-tight: 1.3;
+
+    /* Spacing */
+    --space-xs: 4px;
+    --space-sm: 8px;
+    --space-md: 16px;
+    --space-lg: 24px;
+    --space-xl: 32px;
+    --space-2xl: 48px;
+
+    /* Geometry & Shadows (Multi-layered Premium elevation) */
+    --radius-sm: 6px;
+    --radius-md: 10px;
+    --radius-lg: 16px;
+    --radius-pill: 9999px;
+    --shadow-soft: 0 2px 8px -2px rgba(17, 24, 39, 0.03), 0 4px 14px -4px rgba(17, 24, 39, 0.04);
+    --shadow-floating: 0 14px 45px -10px rgba(17, 24, 39, 0.08), 0 0 2px rgba(17, 24, 39, 0.12);
+
+    /* Motion */
+    --ease-spring: cubic-bezier(0.16, 1, 0.3, 1);
+    --duration-fast: 150ms;
+    --duration-base: 300ms;
+}
+
+/* Base Reset */
+*,
+*::before,
+*::after {
+    box-sizing: border-box;
+    margin: 0;
+    padding: 0;
+}
+
+html,
+body {
+    height: 100%;
+    font-family: var(--font-main);
+    font-size: 16px;
+    /* Base for rems */
+    background-color: var(--c-bg-app);
+    color: var(--c-text-main);
+    line-height: var(--lh-relaxed);
+    -webkit-font-smoothing: antialiased;
+    scroll-behavior: smooth;
+
+    /* Extremely subtle noise texture via SVG data URI */
+    background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 200 200' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='noiseFilter'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.8' numOctaves='3' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23noiseFilter)' opacity='0.02'/%3E%3C/svg%3E");
+}
+
+a {
+    color: var(--c-primary);
+    text-decoration: none;
+    transition: opacity var(--duration-fast) var(--ease-spring);
+}
+
+a:hover {
+    opacity: 0.8;
+}
+
+ul {
+    list-style: none;
+}
+
+/* Premium Webkit Scrollbars */
+::-webkit-scrollbar {
+    width: 6px;
+    height: 6px;
+}
+
+::-webkit-scrollbar-track {
+    background: transparent;
+}
+
+::-webkit-scrollbar-thumb {
+    background: #D1D5DB;
+    border-radius: var(--radius-pill);
+}
+
+::-webkit-scrollbar-thumb:hover {
+    background: #9CA3AF;
+}
+
+/* Typography Utility */
+.text-muted {
+    color: var(--c-text-muted);
+}
+
+.text-sm {
+    font-size: var(--fs-sm);
+}
+
+.text-center {
+    text-align: center;
+}
+
+/* Reusable Animation Classes */
+.animate-fade-up {
+    animation: fadeUp var(--duration-base) var(--ease-spring) forwards;
+}
+
+@keyframes fadeUp {
+    from {
+        opacity: 0;
+        transform: translateY(10px);
+    }
+
+    to {
+        opacity: 1;
+        transform: translateY(0);
+    }
+}

@@ -1,0 +1,109 @@
+/* ==========================================================================
+   Layout Architecture
+   ========================================================================== */
+
+/* The main Application Shell */
+.l-app {
+    display: flex;
+    flex-direction: column;
+    height: 100vh;
+    width: 100vw;
+    overflow: hidden;
+}
+
+/* Tablet & Desktop Layout */
+@media (min-width: 768px) {
+    .l-app {
+        flex-direction: row;
+    }
+}
+
+/* 1. Left Sidebar */
+.l-app__sidebar {
+    flex: 0 0 80px;
+    /* Collapsed desktop default */
+    background-color: #F9FAFB;
+    /* Very subtle grey contrast */
+    border-right: 1px solid rgba(0, 0, 0, 0.06);
+    display: flex;
+    flex-direction: column;
+    z-index: 10;
+    transition: flex var(--duration-base) var(--ease-spring);
+}
+
+@media (min-width: 1024px) {
+    .l-app__sidebar {
+        flex: 0 0 250px;
+        /* Expanded default */
+    }
+}
+
+/* Top App Header (Search etc) */
+.l-app__header {
+    height: 72px;
+    /* Taller, breathable header */
+    display: flex;
+    align-items: center;
+    padding: 0 var(--space-xl);
+    background: var(--c-bg-app);
+    border-bottom: 1px solid rgba(0, 0, 0, 0.06);
+    z-index: 5;
+    flex-shrink: 0;
+}
+
+/* 2. Main Center Content */
+.l-app__main {
+    flex: 1;
+    display: flex;
+    flex-direction: column;
+    min-width: 0;
+    /* Important for flex child truncation */
+    position: relative;
+    background: var(--c-bg-app);
+}
+
+.l-app__content {
+    flex: 1;
+    overflow-y: auto;
+    padding: var(--space-xl);
+    position: relative;
+}
+
+/* Chat Feed Constraint (Linear/Discord Narrow Column) */
+.l-app__content.chat-feed {
+    padding-bottom: 140px;
+    /* Massive breathing room for float input */
+}
+
+.chat-container-inner {
+    max-width: 768px;
+    /* NARROW READABLE COLUMN */
+    margin: 0 auto;
+    display: flex;
+    flex-direction: column;
+    padding: 0 var(--space-xl);
+}
+
+/* 3. Context Right Sidebar */
+.l-app__context {
+    display: none;
+    flex: 0 0 300px;
+    /* Wider right sidebar */
+    background-color: #FAFAFA;
+    border-left: 1px solid rgba(0, 0, 0, 0.06);
+    overflow-y: auto;
+}
+
+@media (min-width: 1200px) {
+    .l-app__context {
+        display: block;
+    }
+}
+
+/* Layout Utilities */
+.l-grid-masonry {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(320px, 1fr));
+    gap: var(--space-xl);
+    align-items: start;
+}

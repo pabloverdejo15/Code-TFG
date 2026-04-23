@@ -49,16 +49,7 @@ class AuthController {
                 $_SESSION['user_name'] = $user->nombre;
                 $_SESSION['user_avatar'] = $user->avatar;
                 
-                // --- REMEMBER ME LOGIC ---
-                // Create a secure signature: UserID + PasswordHash (from DB)
-                // If user changes password, the hash changes, invalidating the cookie.
-                // We need the password hash. The login() method might not populate it in $user object public props, 
-                // but we can fetch it or trust the logic. 
-                // Let's verify: $user->login() verifies partials but doesn't store the hash in public prop 'contrasena'.
-                // We should re-fetch or modify login to store it. 
-                // Actually, let's fetch the user data properly or use a simpler secret key for now if hash isn't available, 
-                // BUT the plan said to use the hash.
-                
+                // Crear cookie de Remember Me (30 días)
                 // Let's get the hash cleanly.
                 $loggedUser = $user->findById($user->id_usuario);
                 if ($loggedUser) {

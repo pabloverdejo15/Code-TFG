@@ -80,7 +80,40 @@ class ChannelController {
             // Marcar como leídos para los ticks (logic antigua pero necesaria)
             $messageModel->markAsRead($current_channel_id, $user_id);
 
-            $messages = $messageModel->getByChannel($current_channel_id);
+            $rawMessages = $messageModel->getByChannel($current_channel_id);
+            
+            // --- Premium Chat Rhythm Logic ---
+            $messages = [];
+            $previousMessage = null;
+
+            foreach ($rawMessages as $msg) {
+                // Determine Rhythm Spacing
+                if ($previousMessage && $previousMessage['id_usuario'] === $msg['id_usuario']) {
+                    // Check time difference
+                    $timeDiff = strtotime($msg['fecha_publicacion']) - strtotime($previousMessage['fecha_publicacion']);
+                    
+                    if ($timeDiff <= 120) { // < 2 Minutes -> TIGHT (Group together, hide avatar)
+                        $msg['spacing_tier'] = 'tight';
+                        $msg['hide_avatar'] = true;
+                    } elseif ($timeDiff <= 300) { // < 5 Minutes -> MEDIUM
+                        $msg['spacing_tier'] = 'medium';
+                        $msg['hide_avatar'] = true;
+                    } else { // > 5 Minutes -> WIDE (New block, same user)
+                        $msg['spacing_tier'] = 'wide';
+                        $msg['hide_avatar'] = false;
+                    }
+                } else {
+                    // Different User -> Normal Block (Avatar visible)
+                    $msg['spacing_tier'] = 'wide';
+                    $msg['hide_avatar'] = false;
+                }
+                
+                // Also format time elegantly
+                $msg['time_formatted'] = date('H:i', strtotime($msg['fecha_publicacion']));
+                
+                $messages[] = $msg;
+                $previousMessage = $msg;
+            }
             
             // Actualizar el timestamp de lectura del canal
             $channelModel->updateLastRead($user_id, $current_channel_id);
@@ -97,8 +130,20 @@ class ChannelController {
     public function create() {
         if ($_SERVER['REQUEST_METHOD'] == 'POST') {
             $community_id = $_POST['community_id'];
-            // Verificar permisos admin (simplificado, se debería chequear rol en cada acción)
-             // ... chequeo de rol pendiente o confiamos en vista ... -> Mejor chequear aquí.
+            $user_id = $_SESSION['user_id'];
+            
+            // Verificar permisos admin
+            $db = (new Database())->getConnection();
+            $query = "SELECT rol FROM usuario_comunidad WHERE id_usuario = :uid AND id_comunidad = :cid";
+            $stmt = $db->prepare($query);
+            $stmt->bindParam(':uid', $user_id);
+            $stmt->bindParam(':cid', $community_id);
+            $stmt->execute();
+            $membership = $stmt->fetch(PDO::FETCH_ASSOC);
+
+            if (!$membership || $membership['rol'] !== 'admin') {
+                die("Acceso denegado. Solo los administradores pueden crear canales.");
+            }
             
             $channel = new Channel();
             $channel->id_comunidad = $community_id;
