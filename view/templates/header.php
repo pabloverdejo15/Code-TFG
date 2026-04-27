@@ -9,8 +9,8 @@
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
     
     <!-- New UI Architecture -->
-    <link rel="stylesheet" href="<?php echo BASE_URL; ?>css/base.css?v=<?php echo time(); ?>">
-    <link rel="stylesheet" href="<?php echo BASE_URL; ?>css/layout.css?v=<?php echo time(); ?>">
-    <link rel="stylesheet" href="<?php echo BASE_URL; ?>css/components.css?v=<?php echo time(); ?>">
+    <link rel="stylesheet" href="<?php echo BASE_URL; ?>css/base.css?v=1.0">
+    <link rel="stylesheet" href="<?php echo BASE_URL; ?>css/layout.css?v=1.0">
+    <link rel="stylesheet" href="<?php echo BASE_URL; ?>css/components.css?v=1.0">
 </head>
 <body>
