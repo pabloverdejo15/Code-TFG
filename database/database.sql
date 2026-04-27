@@ -152,3 +152,43 @@ CREATE TABLE  mensaje_lecturas (
   CONSTRAINT `fk_lectura_mensaje` FOREIGN KEY (`id_mensaje`) REFERENCES `mensajes` (`id_mensaje`) ON DELETE CASCADE,
   CONSTRAINT `fk_lectura_usuario` FOREIGN KEY (`id_usuario`) REFERENCES `usuarios` (`id_usuario`) ON DELETE CASCADE
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
+
+-- --------------------------------------------------------
+
+--
+-- Estructura de tabla para la tabla `cuotas`
+--
+
+CREATE TABLE `cuotas` (
+  `id_cuota` int(11) NOT NULL AUTO_INCREMENT,
+  `id_comunidad` int(11) NOT NULL,
+  `concepto` varchar(200) NOT NULL,
+  `importe` decimal(10,2) NOT NULL,
+  `fecha_vencimiento` date NOT NULL,
+  `periodicidad` enum('unica','mensual','trimestral','anual') DEFAULT 'unica',
+  `fecha_creacion` datetime DEFAULT current_timestamp(),
+  `estado` enum('activa','cerrada') DEFAULT 'activa',
+  PRIMARY KEY (`id_cuota`),
+  KEY `id_comunidad` (`id_comunidad`),
+  CONSTRAINT `fk_cuota_comunidad` FOREIGN KEY (`id_comunidad`) REFERENCES `comunidades` (`id_comunidad`) ON DELETE CASCADE
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
+
+-- --------------------------------------------------------
+
+--
+-- Estructura de tabla para la tabla `pagos`
+--
+
+CREATE TABLE `pagos` (
+  `id_pago` int(11) NOT NULL AUTO_INCREMENT,
+  `id_cuota` int(11) NOT NULL,
+  `id_usuario` int(11) NOT NULL,
+  `fecha_pago` datetime DEFAULT NULL,
+  `estado` enum('pendiente','pagado') DEFAULT 'pendiente',
+  `fecha_creacion` datetime DEFAULT current_timestamp(),
+  PRIMARY KEY (`id_pago`),
+  UNIQUE KEY `uq_pago_cuota_usuario` (`id_cuota`, `id_usuario`),
+  KEY `id_usuario` (`id_usuario`),
+  CONSTRAINT `fk_pago_cuota` FOREIGN KEY (`id_cuota`) REFERENCES `cuotas` (`id_cuota`) ON DELETE CASCADE,
+  CONSTRAINT `fk_pago_usuario` FOREIGN KEY (`id_usuario`) REFERENCES `usuarios` (`id_usuario`) ON DELETE CASCADE
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;

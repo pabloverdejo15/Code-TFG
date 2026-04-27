@@ -74,7 +74,21 @@
                                 <div class="text-muted" style="font-size: var(--fs-sm); display: flex; align-items: center; gap: 6px; margin-bottom: var(--space-sm);">
                                     📍 <?php echo htmlspecialchars($comm['direccion']); ?>
                                 </div>
-                                
+
+                                <?php if (!empty($comm['weather'])): $w = $comm['weather']; ?>
+                                <div class="weather-widget" title="<?php echo htmlspecialchars($w['descripcion']); ?>">
+                                    <div class="weather-widget__icon"><?php echo $w['emoji']; ?></div>
+                                    <div class="weather-widget__info">
+                                        <span class="weather-widget__temp"><?php echo $w['temp']; ?>°C</span>
+                                        <span class="weather-widget__desc"><?php echo htmlspecialchars($w['descripcion']); ?></span>
+                                    </div>
+                                    <div class="weather-widget__extra">
+                                        <span>💧 <?php echo $w['humedad']; ?>%</span>
+                                        <span>💨 <?php echo $w['viento']; ?> km/h</span>
+                                    </div>
+                                </div>
+                                <?php endif; ?>
+
                                 <p style="font-size: var(--fs-base); color: var(--c-text-main); margin-bottom: var(--space-lg); line-height: var(--lh-relaxed);">
                                     <?php echo htmlspecialchars($comm['descripcion']); ?>
                                 </p>
@@ -111,7 +125,21 @@
                                 <div class="text-muted" style="font-size: var(--fs-sm); display: flex; align-items: center; gap: 6px; margin-bottom: var(--space-sm);">
                                     📍 <?php echo htmlspecialchars($comm['direccion']); ?>
                                 </div>
-                                
+
+                                <?php if (!empty($comm['weather'])): $w = $comm['weather']; ?>
+                                <div class="weather-widget" title="<?php echo htmlspecialchars($w['descripcion']); ?>">
+                                    <div class="weather-widget__icon"><?php echo $w['emoji']; ?></div>
+                                    <div class="weather-widget__info">
+                                        <span class="weather-widget__temp"><?php echo $w['temp']; ?>°C</span>
+                                        <span class="weather-widget__desc"><?php echo htmlspecialchars($w['descripcion']); ?></span>
+                                    </div>
+                                    <div class="weather-widget__extra">
+                                        <span>💧 <?php echo $w['humedad']; ?>%</span>
+                                        <span>💨 <?php echo $w['viento']; ?> km/h</span>
+                                    </div>
+                                </div>
+                                <?php endif; ?>
+
                                 <p style="font-size: var(--fs-base); color: var(--c-text-main); margin-bottom: var(--space-lg); line-height: var(--lh-relaxed);">
                                     <?php echo htmlspecialchars($comm['descripcion']); ?>
                                 </p>

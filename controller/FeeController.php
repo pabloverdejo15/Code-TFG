@@ -1,9 +1,10 @@
 <?php
-require_once 'model/Notice.php';
+require_once 'model/Fee.php';
 require_once 'model/Community.php';
 require_once 'model/db.php';
+require_once 'model/Channel.php'; // Required if we extract sidebar
 
-class NoticeController {
+class FeeController {
 
     public function __construct() {
         if (!isset($_SESSION['user_id'])) {
@@ -40,16 +41,15 @@ class NoticeController {
         $stmtComm->execute();
         $community = $stmtComm->fetch(PDO::FETCH_ASSOC);
 
-        // Obtener avisos
-        $noticeModel = new Notice();
-        $notices = $noticeModel->getByCommunity($community_id);
-
         // Fetch Channels for the sidebar
-        require_once 'model/Channel.php';
         $channelModel = new Channel();
         $channels = $channelModel->getByCommunity($community_id, $user_id);
 
-        require_once 'view/notice/index.php';
+        // Fetch Fees
+        $feeModel = new Fee();
+        $fees = $feeModel->getByUserAndCommunity($user_id, $community_id);
+
+        require_once 'view/fees/index.php';
     }
 
     public function create() {
@@ -69,51 +69,47 @@ class NoticeController {
             $membership = $stmt->fetch(PDO::FETCH_ASSOC);
 
             if (!$membership || $membership['rol'] !== 'admin') {
-                die("Acceso denegado. Solo administradores pueden crear avisos.");
+                die("Acceso denegado. Solo administradores pueden crear cuotas.");
             }
             
-            $notice = new Notice();
-            $notice->id_comunidad = $community_id;
-            $notice->titulo = $_POST['titulo'];
-            $notice->descripcion = $_POST['descripcion'];
-            $notice->tipo = $_POST['tipo'];
-
-            if ($notice->create()) {
-                header("Location: " . BASE_URL . "?controller=Notice&action=index&community_id=" . $community_id . "&" . SID);
+            // Get all community members
+            $communityModel = new Community();
+            $members = $communityModel->getMembers($community_id);
+            
+            $concepto = $_POST['concepto'];
+            $monto = $_POST['monto'];
+            $fecha_vencimiento = $_POST['fecha_vencimiento'];
+            $batch_id = uniqid('fee_batch_');
+            
+            $feeModel = new Fee();
+            if ($feeModel->createForCommunity($community_id, $concepto, $monto, $fecha_vencimiento, $batch_id, $members)) {
+                header("Location: " . BASE_URL . "?controller=Fee&action=index&community_id=" . $community_id . "&" . SID);
             } else {
-                echo "Error al crear aviso.";
+                echo "Error al crear cuotas.";
             }
         }
     }
 
-    public function delete() {
-        if (!isset($_GET['id']) || !isset($_GET['community_id'])) {
-            die("Datos insuficientes.");
-        }
-
-        $community_id = $_GET['community_id'];
-        $user_id = $_SESSION['user_id'];
+    public function pay() {
+        header('Content-Type: application/json');
         
-        // Verificar permisos de admin
-        $db = (new Database())->getConnection();
-        $query = "SELECT rol FROM usuario_comunidad WHERE id_usuario = :uid AND id_comunidad = :cid";
-        $stmt = $db->prepare($query);
-        $stmt->bindParam(':uid', $user_id);
-        $stmt->bindParam(':cid', $community_id);
-        $stmt->execute();
-        $membership = $stmt->fetch(PDO::FETCH_ASSOC);
-
-        if (!$membership || $membership['rol'] !== 'admin') {
-            die("Acceso denegado. Solo administradores pueden borrar avisos.");
-        }
-
-        $notice = new Notice();
-        $notice->id_aviso = $_GET['id'];
-        
-        if ($notice->delete()) {
-            header("Location: " . BASE_URL . "?controller=Notice&action=index&community_id=" . $community_id . "&msg=deleted&" . SID);
-        } else {
-            echo "Error al eliminar.";
+        if ($_SERVER['REQUEST_METHOD'] == 'POST') {
+            $input = json_decode(file_get_contents('php://input'), true);
+            $fee_id = isset($input['fee_id']) ? $input['fee_id'] : null;
+            $user_id = $_SESSION['user_id'];
+            
+            if (!$fee_id) {
+                echo json_encode(['success' => false, 'message' => 'Falta el ID de la cuota']);
+                exit;
+            }
+            
+            $feeModel = new Fee();
+            if ($feeModel->simulatePayment($fee_id, $user_id)) {
+                echo json_encode(['success' => true, 'message' => 'Pago realizado correctamente']);
+            } else {
+                echo json_encode(['success' => false, 'message' => 'Error al procesar el pago o la cuota ya está pagada.']);
+            }
+            exit;
         }
     }
 }

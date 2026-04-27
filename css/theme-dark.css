@@ -35,7 +35,7 @@ body, .l-app {
     }
 }
 
-.l-app__sidebar, .l-app__header, .l-app__context {
+.l-app__sidebar, .l-app__header, .l-app__context, .l-app__secondary {
     background: rgba(10, 10, 10, 0.6) !important;
     backdrop-filter: blur(20px) !important;
     -webkit-backdrop-filter: blur(20px) !important;
@@ -71,4 +71,30 @@ body, .l-app {
     background: var(--c-bg-card) !important;
     backdrop-filter: blur(30px) !important;
     border: 1px solid var(--c-border) !important;
+}
+
+/* Chat Input Overrides */
+.chat-container-inner {
+    max-width: none !important;
+    width: 100% !important;
+    padding: 0 var(--space-2xl) !important;
+}
+
+.chat-input-area {
+    background: linear-gradient(to top, var(--c-bg-app) 75%, transparent) !important;
+    width: 100% !important;
+}
+
+.chat-input-box {
+    background: rgba(20, 20, 20, 0.9) !important;
+    border: 1px solid var(--c-border) !important;
+    max-width: none !important;
+    width: 100% !important;
+    border-radius: 16px !important;
+}
+
+.chat-input-box:focus-within {
+    border-color: var(--c-primary) !important;
+    box-shadow: 0 0 0 2px rgba(0, 85, 255, 0.2) !important;
+    background: rgba(25, 25, 25, 0.95) !important;
 }

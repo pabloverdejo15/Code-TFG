@@ -1,10 +1,13 @@
 <?php include 'view/templates/header.php'; ?>
 
+<!-- Scoped Dark Theme -->
+<link rel="stylesheet" href="<?php echo BASE_URL; ?>css/theme-dark.css?v=<?php echo time(); ?>">
+
 <div class="l-app">
     <?php include 'view/components/sidebar.php'; ?>
 
     <main class="l-app__main">
-        <header class="l-app__header" style="justify-content: flex-start; border-bottom: 1px solid var(--c-border); background: rgba(253, 253, 253, 0.85); backdrop-filter: blur(12px); position: absolute; width: 100%; top: 0; z-index: 10;">
+        <header class="l-app__header" style="justify-content: flex-start; border-bottom: 1px solid var(--c-border); position: absolute; width: 100%; top: 0; z-index: 10;">
             <a href="javascript:history.back()" class="btn-icon" style="margin-right: var(--space-md);">&larr;</a>
             <div style="display: flex; align-items: center; gap: 12px;">
                 <?php if($target_user['avatar']): ?>

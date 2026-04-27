@@ -60,5 +60,36 @@ class Message {
         $stmt->bindParam(':id_canal', $id_canal);
         return $stmt->execute();
     }
+
+    public function getByChannelPaginated($id_canal, $before_id = null, $limit = 30) {
+        $query = "SELECT m.*, u.nombre as nombre_usuario, u.avatar,
+                  (SELECT COUNT(*) FROM mensaje_lecturas ml WHERE ml.id_mensaje = m.id_mensaje) as num_leidos,
+                  (SELECT COUNT(*) FROM usuario_comunidad uc 
+                      JOIN canales c ON c.id_comunidad = uc.id_comunidad 
+                      WHERE c.id_canal = m.id_canal) as total_miembros
+                  FROM " . $this->table . " m 
+                  JOIN usuarios u ON m.id_usuario = u.id_usuario 
+                  WHERE m.id_canal = :id_canal ";
+        
+        if ($before_id !== null && $before_id > 0) {
+            $query .= " AND m.id_mensaje < :before_id ";
+        }
+        
+        $query .= " ORDER BY m.id_mensaje DESC LIMIT :limit";
+                  
+        $stmt = $this->conn->prepare($query);
+        $stmt->bindParam(':id_canal', $id_canal);
+        
+        if ($before_id !== null && $before_id > 0) {
+            $stmt->bindParam(':before_id', $before_id, PDO::PARAM_INT);
+        }
+        $stmt->bindValue(':limit', (int)$limit, PDO::PARAM_INT);
+        
+        $stmt->execute();
+        $messages = $stmt->fetchAll(PDO::FETCH_ASSOC);
+        
+        // Reverse array because we fetched DESC, but we need ascending order (oldest -> newest) for rendering the batch
+        return array_reverse($messages);
+    }
 }
 ?>

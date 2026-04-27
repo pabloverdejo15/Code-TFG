@@ -80,7 +80,7 @@ class ChannelController {
             // Marcar como leídos para los ticks (logic antigua pero necesaria)
             $messageModel->markAsRead($current_channel_id, $user_id);
 
-            $rawMessages = $messageModel->getByChannel($current_channel_id);
+            $rawMessages = $messageModel->getByChannelPaginated($current_channel_id, null, 30);
             
             // --- Premium Chat Rhythm Logic ---
             $messages = [];
@@ -175,6 +175,87 @@ class ChannelController {
             // Recargar página en el mismo canal
             header("Location: " . BASE_URL . "?controller=Channel&action=index&community_id=" . $community_id . "&channel_id=" . $channel_id . "&" . SID);
         }
+    }
+
+    public function ajax_fetch_messages() {
+        header('Content-Type: application/json');
+        
+        if (!isset($_GET['channel_id'])) {
+            echo json_encode(['error' => 'No channel ID provided']);
+            exit;
+        }
+        
+        $channel_id = $_GET['channel_id'];
+        $before_id = isset($_GET['before_id']) ? (int)$_GET['before_id'] : null;
+        $limit = 30;
+        $user_id = $_SESSION['user_id'];
+        
+        // Needed for view
+        $communityModel = new Community();
+        // Get community id from channel (quick query or passing it)
+        $db = (new Database())->getConnection();
+        $stmt = $db->prepare("SELECT id_comunidad FROM canales WHERE id_canal = ?");
+        $stmt->execute([$channel_id]);
+        $chan = $stmt->fetch(PDO::FETCH_ASSOC);
+        
+        if (!$chan) {
+            echo json_encode(['error' => 'Channel not found']);
+            exit;
+        }
+        $community_id = $chan['id_comunidad'];
+        
+        // Simulate community fetching for the view if it uses $community variable
+        $stmtComm = $db->prepare("SELECT * FROM comunidades WHERE id_comunidad = ?");
+        $stmtComm->execute([$community_id]);
+        $community = $stmtComm->fetch(PDO::FETCH_ASSOC);
+        
+        $members = $communityModel->getMembers($community_id);
+        
+        $messageModel = new Message();
+        $rawMessages = $messageModel->getByChannelPaginated($channel_id, $before_id, $limit);
+        
+        $messages = [];
+        $previousMessage = null;
+        
+        foreach ($rawMessages as $msg) {
+            if ($previousMessage && $previousMessage['id_usuario'] === $msg['id_usuario']) {
+                $timeDiff = strtotime($msg['fecha_publicacion']) - strtotime($previousMessage['fecha_publicacion']);
+                if ($timeDiff <= 120) { 
+                    $msg['spacing_tier'] = 'tight';
+                    $msg['hide_avatar'] = true;
+                } elseif ($timeDiff <= 300) { 
+                    $msg['spacing_tier'] = 'medium';
+                    $msg['hide_avatar'] = true;
+                } else { 
+                    $msg['spacing_tier'] = 'wide';
+                    $msg['hide_avatar'] = false;
+                }
+            } else {
+                $msg['spacing_tier'] = 'wide';
+                $msg['hide_avatar'] = false;
+            }
+            $msg['time_formatted'] = date('H:i', strtotime($msg['fecha_publicacion']));
+            $messages[] = $msg;
+            $previousMessage = $msg;
+        }
+        
+        $html = '';
+        if (!empty($messages)) {
+            ob_start();
+            foreach ($messages as $msg) {
+                include 'view/components/chat_message.php';
+            }
+            $html = ob_get_clean();
+        }
+        
+        $new_oldest_id = !empty($messages) ? $messages[0]['id_mensaje'] : null;
+        
+        echo json_encode([
+            'html' => $html,
+            'has_more' => count($messages) === $limit,
+            'new_oldest_id' => $new_oldest_id
+        ]);
+        exit;
     }
 }
 ?>

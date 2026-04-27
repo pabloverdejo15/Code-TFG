@@ -1,57 +1,23 @@
 <?php include 'view/templates/header.php'; ?>
 
+<!-- Scoped Dark Theme -->
+<link rel="stylesheet" href="<?php echo BASE_URL; ?>css/theme-dark.css?v=<?php echo time(); ?>">
+
 <div class="l-app">
     <!-- 1. Primary Global Sidebar -->
     <?php include 'view/components/sidebar.php'; ?>
 
-    <!-- 2. Secondary Context Sidebar (Channels) -->
-    <aside class="l-app__secondary" style="flex: 0 0 260px; display: flex; flex-direction: column; border-right: 1px solid var(--c-border); background: #FAFAFA;">
-        <div style="padding: var(--space-md); border-bottom: 1px solid var(--c-border); background: var(--c-bg-app); position: sticky; top: 0;">
-            <h2 style="font-size: var(--fs-md); font-weight: 700; color: var(--c-text-main); margin-bottom: 2px;"><?php echo htmlspecialchars($community['nombre']); ?></h2>
-            <div style="font-size: var(--fs-xs); color: var(--c-text-muted);">Entorno interactivo</div>
-        </div>
-        
-        <div style="flex: 1; overflow-y: auto; padding: var(--space-lg) var(--space-sm);">
-            <a href="<?php echo BASE_URL; ?>?controller=Notice&action=index&community_id=<?php echo $community_id; ?>&<?php echo SID; ?>" class="btn-sidebar" style="margin-bottom: var(--space-lg); background: var(--c-secondary); color: var(--c-primary-hover);">
-                📢 Tablón de Avisos
-            </a>
-            
-            <div style="font-size: 0.70rem; text-transform: uppercase; color: var(--c-text-muted); font-weight: 700; padding: 0 var(--space-sm) var(--space-sm); letter-spacing: 0.5px;">Comunicaciones</div>
-            <ul style="display: flex; flex-direction: column; gap: 4px;">
-                 <?php foreach($channels as $c): ?>
-                    <li>
-                        <a href="<?php echo BASE_URL; ?>?controller=Channel&action=index&community_id=<?php echo $community_id; ?>&channel_id=<?php echo $c['id_canal']; ?>&<?php echo SID; ?>" 
-                           class="btn-sidebar <?php echo ($current_channel_id == $c['id_canal']) ? 'is-active' : ''; ?>">
-                           
-                           <span style="opacity: <?php echo ($current_channel_id == $c['id_canal']) ? '1' : '0.6'; ?>; margin-right: 8px;">#</span> 
-                           <span style="flex: 1; text-align: left; overflow: hidden; text-overflow: ellipsis; white-space: nowrap;"><?php echo htmlspecialchars($c['nombre']); ?></span>
-                           
-                           <?php if($c['unread_count'] > 0 && $c['id_canal'] != $current_channel_id): ?>
-                               <span style="background-color: var(--c-error); width: 8px; height: 8px; border-radius: 50%; flex-shrink: 0;"></span>
-                           <?php endif; ?>
-                        </a>
-                    </li>
-                 <?php endforeach; ?>
-                 <?php if(empty($channels)): ?>
-                    <li style="padding: 0.5rem 1rem; font-size: var(--fs-xs); color: var(--c-text-muted);">No hay canales aún.</li>
-                 <?php endif; ?>
-            </ul>
-        </div>
-        
-        <div style="padding: var(--space-md); border-top: 1px solid var(--c-border); background: var(--c-bg-app);">
-            <?php if($user_role == 'admin'): ?>
-                <button onclick="openModal('createChannelModal')" class="btn" style="width: 100%; justify-content: space-between; background: transparent; border: 1px dashed var(--c-text-muted); color: var(--c-text-muted);">
-                    <span>+ Crear Canal</span>
-                </button>
-            <?php endif; ?>
-        </div>
-    </aside>
+    <!-- 2. Secondary Context Sidebar -->
+    <?php 
+    $active_section = 'channels';
+    include 'view/components/community_sidebar.php'; 
+    ?>
 
     <!-- 3. Main Chat Interface -->
     <main class="l-app__main">
         <?php if($current_channel): ?>
             <!-- Sticky Glass Header -->
-            <header class="l-app__header" style="justify-content: space-between; border-bottom: 1px solid var(--c-border); background: rgba(253, 253, 253, 0.85); backdrop-filter: blur(12px); position: absolute; width: 100%; top: 0; z-index: 10;">
+            <header class="l-app__header" style="justify-content: space-between; border-bottom: 1px solid var(--c-border); position: absolute; width: 100%; top: 0; z-index: 10;">
                 <div style="display: flex; align-items: center; gap: 12px;">
                     <span style="font-size: 1.5rem; color: var(--c-text-muted); font-weight: 300;">#</span>
                     <div>
@@ -63,7 +29,7 @@
 
             <!-- Scrollable Message Feed -->
             <div class="l-app__content chat-feed" id="messages-container" style="padding-top: 80px; scroll-behavior: auto;">
-                <div class="chat-container-inner">
+                <div class="chat-container-inner" data-oldest-id="<?php echo empty($messages) ? 0 : $messages[0]['id_mensaje']; ?>">
                     <?php if(empty($messages)): ?>
                         <div class="empty-state animate-fade-up" style="margin-top: 10vh;">
                             <div class="empty-state__icon" style="background: transparent; font-size: 4rem;">👋</div>
@@ -100,12 +66,13 @@
 
             <!-- Floating Input Box -->
             <div class="chat-input-area">
-                <form action="<?php echo BASE_URL; ?>?controller=Channel&action=send&<?php echo SID; ?>" method="POST" style="width: 100%; max-width: 900px;">
+                <form action="<?php echo BASE_URL; ?>?controller=Channel&action=send&<?php echo SID; ?>" method="POST" style="width: 100%;">
                     <div class="chat-input-box">
                         <input type="hidden" name="community_id" value="<?php echo $community_id; ?>">
                         <input type="hidden" name="channel_id" value="<?php echo $current_channel_id; ?>">
+                        <input type="file" id="fileUpload" style="display: none;" onchange="handleFileUpload(this)">
                         
-                        <button type="button" class="btn-icon" style="padding: 4px; color: var(--c-text-muted);" title="Adjuntar (Pronto)">📎</button>
+                        <button type="button" class="btn-icon" style="padding: 6px; color: var(--c-text-muted); font-size: 1.1rem; display: flex; align-items: center; justify-content: center; transition: color 0.2s;" title="Adjuntar Archivo" onclick="document.getElementById('fileUpload').click();" onmouseover="this.style.color='var(--c-text-main)'" onmouseout="this.style.color='var(--c-text-muted)'">📎</button>
                         
                         <input type="text" class="chat-input-box__field" name="contenido" placeholder="Enviar mensaje a #<?php echo htmlspecialchars($current_channel['nombre']); ?>..." autocomplete="off" required autofocus>
                         
@@ -124,6 +91,66 @@
                         msgContainer.scrollTop = msgContainer.scrollHeight;
                     }
                 });
+
+                function handleFileUpload(input) {
+                    if (input.files && input.files.length > 0) {
+                        console.log("Archivo seleccionado:", input.files[0].name);
+                    }
+                }
+
+                // Infinite Scroll Pagination
+                const msgContainer = document.getElementById("messages-container");
+                const innerContainer = document.querySelector(".chat-container-inner");
+                let isLoading = false;
+                let hasMore = true;
+
+                if (msgContainer && innerContainer) {
+                    msgContainer.addEventListener("scroll", async () => {
+                        if (msgContainer.scrollTop <= 10 && !isLoading && hasMore) {
+                            isLoading = true;
+                            const oldestId = innerContainer.getAttribute("data-oldest-id");
+                            
+                            // Save exact height before any changes
+                            const oldHeight = msgContainer.scrollHeight;
+
+                            // Add a subtle loader at the top
+                            const loader = document.createElement("div");
+                            loader.id = "chat-top-loader";
+                            loader.style = "text-align: center; padding: 10px; color: var(--c-text-muted); font-size: 0.8rem;";
+                            loader.innerHTML = "<span>Cargando mensajes...</span>";
+                            innerContainer.prepend(loader);
+
+                            try {
+                                const response = await fetch(`<?php echo BASE_URL; ?>?controller=Channel&action=ajax_fetch_messages&channel_id=<?php echo $current_channel_id; ?>&before_id=${oldestId}&<?php echo SID; ?>`);
+                                const data = await response.json();
+                                
+                                loader.remove();
+
+                                if (data.html) {
+                                    innerContainer.insertAdjacentHTML('afterbegin', data.html);
+                                    
+                                    if (data.new_oldest_id) {
+                                        innerContainer.setAttribute("data-oldest-id", data.new_oldest_id);
+                                    }
+                                    
+                                    // CRITICAL: Restore scroll position accurately
+                                    const newHeight = msgContainer.scrollHeight;
+                                    msgContainer.scrollTop = newHeight - oldHeight + msgContainer.scrollTop;
+                                }
+                                
+                                if (data.has_more === false) {
+                                    hasMore = false;
+                                }
+
+                            } catch (err) {
+                                console.error("Error loading messages:", err);
+                                loader.remove();
+                            } finally {
+                                isLoading = false;
+                            }
+                        }
+                    });
+                }
             </script>
         <?php else: ?>
             <div class="empty-state animate-fade-up" style="margin: auto;">
@@ -134,14 +161,18 @@
     </main>
 
     <!-- 4. Right Panel (Members) -->
-    <aside class="l-app__context" style="display: flex; flex-direction: column; border-left: 1px solid var(--c-border); background: #FAFAFA;">
-        <div style="padding: var(--space-md); border-bottom: 1px solid var(--c-border); position: sticky; top: 0; background: #FAFAFA;">
-            <h2 style="font-size: var(--fs-md); font-weight: 700; color: var(--c-text-main);">Miembros</h2>
-            <div style="font-size: var(--fs-xs); color: var(--c-text-muted);"><?php echo count($members); ?> vecinos</div>
+    <aside class="l-app__context" style="display: flex; flex-direction: column; border-left: 1px solid var(--c-border);">
+        <div style="padding: var(--space-md); border-bottom: 1px solid var(--c-border); position: sticky; top: 0; z-index: 5;">
+            <h2 style="font-size: var(--fs-md); font-weight: 700; color: var(--c-text-main); margin-bottom: 4px;">Miembros</h2>
+            <div style="font-size: var(--fs-xs); color: var(--c-text-muted); margin-bottom: var(--space-md);"><?php echo count($members); ?> vecinos</div>
+            <div class="chat-input-box" style="padding: 6px 12px; background: rgba(0, 0, 0, 0.3); border: 1px solid var(--c-border); border-radius: var(--radius-full); display: flex; align-items: center; gap: 8px;">
+                <span style="color: var(--c-text-muted); font-size: 0.8rem;">🔍</span>
+                <input type="text" id="memberSearch" placeholder="Buscar..." onkeyup="filterMembers()" style="background: transparent; border: none; outline: none; color: var(--c-text-main); font-size: var(--fs-xs); width: 100%;" autocomplete="off">
+            </div>
         </div>
         <div style="flex: 1; overflow-y: auto; padding: var(--space-sm);">
             <?php foreach($members as $member): ?>
-                <div style="display: flex; align-items: center; padding: var(--space-sm); border-radius: var(--radius); transition: background 0.2s; cursor: default;">
+                <div class="member-item" data-name="<?php echo strtolower(htmlspecialchars($member['nombre'])); ?>" style="display: flex; align-items: center; padding: var(--space-sm); border-radius: var(--radius); transition: background 0.2s; cursor: default;">
                     <?php if($member['avatar']): ?>
                         <img src="<?php echo BASE_URL . $member['avatar']; ?>" class="avatar avatar--md" style="margin-right: var(--space-sm);">
                     <?php else: ?>

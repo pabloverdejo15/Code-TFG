@@ -1,6 +1,7 @@
 <?php
 require_once 'model/Community.php';
 require_once 'model/User.php';
+require_once 'model/WeatherService.php';
 
 class CommunityController {
 
@@ -30,6 +31,11 @@ class CommunityController {
         $member_communities = [];
         
         foreach ($all_communities as $comm) {
+            // Enriquecer cada comunidad con datos del tiempo (cacheado 30 min)
+            $comm['weather'] = !empty($comm['direccion'])
+                ? WeatherService::getByAddress($comm['direccion'])
+                : null;
+
             if ($comm['rol'] == 'admin') {
                 $admin_communities[] = $comm;
             } else {

@@ -1,7 +1,15 @@
 <?php include 'view/templates/header.php'; ?>
 
+<!-- Scoped Dark Theme -->
+<link rel="stylesheet" href="<?php echo BASE_URL; ?>css/theme-dark.css?v=<?php echo time(); ?>">
+
 <div class="l-app">
     <?php include 'view/components/sidebar.php'; ?>
+
+    <?php 
+    $active_section = 'notices';
+    include 'view/components/community_sidebar.php'; 
+    ?>
 
     <main class="l-app__main">
         <header class="l-app__header">
@@ -75,8 +83,8 @@
 </div>
 
 <!-- Create Notice Modal -->
-<div id="createNoticeModal" class="modal-overlay" style="display: none; position: fixed; top:0; left:0; width:100%; height:100%; background:rgba(0,0,0,0.4); align-items: center; justify-content: center; z-index: 1000; backdrop-filter: blur(4px);">
-    <div style="background: var(--c-bg-card); padding: var(--space-xl); border-radius: var(--radius-lg); width: 100%; max-width: 450px; box-shadow: var(--shadow-floating);">
+<div id="createNoticeModal" class="modal-overlay" style="display: none; position: fixed; top:0; left:0; width:100%; height:100%; background:rgba(0,0,0,0.6); align-items: center; justify-content: center; z-index: 1000; backdrop-filter: blur(4px);">
+    <div style="background: var(--c-bg-card); padding: var(--space-xl); border-radius: var(--radius-lg); width: 100%; max-width: 450px; box-shadow: var(--shadow-floating); border: 1px solid var(--c-border);">
         <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: var(--space-lg);">
             <h2 style="font-size: var(--fs-xl); font-weight: 700;">📢 Publicar aviso</h2>
             <button class="btn-icon" onclick="closeModal('createNoticeModal')" style="padding: 4px;">✕</button>
@@ -87,21 +95,21 @@
             
             <div class="form-group" style="margin-bottom: var(--space-md);">
                 <label style="display: block; margin-bottom: 6px; font-weight: 500; font-size: var(--fs-sm);">Título</label>
-                <input type="text" class="input" name="titulo" placeholder="Ej. Corte de agua" required>
+                <input type="text" class="input chat-input-box__field" style="background: var(--c-bg-app); border: 1px solid var(--c-border); color: var(--c-text-main);" name="titulo" placeholder="Ej. Corte de agua" required>
             </div>
             
             <div class="form-group" style="margin-bottom: var(--space-md);">
                 <label style="display: block; margin-bottom: 6px; font-weight: 500; font-size: var(--fs-sm);">Tipo</label>
-                <select name="tipo" class="input">
-                    <option value="anuncio">ℹ️ Información</option>
-                    <option value="averia">⚠️ Avería / Incidencia</option>
-                    <option value="reunion">📅 Reunión</option>
+                <select name="tipo" class="input chat-input-box__field" style="background: var(--c-bg-app); border: 1px solid var(--c-border); color: var(--c-text-main);">
+                    <option value="anuncio" style="background: var(--c-bg-card);">ℹ️ Información</option>
+                    <option value="averia" style="background: var(--c-bg-card);">⚠️ Avería / Incidencia</option>
+                    <option value="reunion" style="background: var(--c-bg-card);">📅 Reunión</option>
                 </select>
             </div>
 
             <div class="form-group" style="margin-bottom: var(--space-xl);">
                 <label style="display: block; margin-bottom: 6px; font-weight: 500; font-size: var(--fs-sm);">Detalles</label>
-                <textarea name="descripcion" class="input" rows="4" placeholder="Describe el aviso..." required></textarea>
+                <textarea name="descripcion" class="input chat-input-box__field" style="background: var(--c-bg-app); border: 1px solid var(--c-border); color: var(--c-text-main);" rows="4" placeholder="Describe el aviso..." required></textarea>
             </div>
             
             <div style="display: flex; gap: var(--space-sm);">
