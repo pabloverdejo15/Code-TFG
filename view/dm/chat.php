@@ -6,8 +6,14 @@
 <div class="l-app">
     <?php include 'view/components/sidebar.php'; ?>
 
+    <!-- Overlay for mobile sidebar -->
+    <div class="sidebar-overlay" id="mobileOverlay"></div>
+
     <main class="l-app__main">
         <header class="l-app__header" style="justify-content: flex-start; border-bottom: 1px solid var(--c-border); position: absolute; width: 100%; top: 0; z-index: 10;">
+            <button class="hamburger-btn" id="mobileMenuBtn" aria-label="Abrir menú" style="margin-right: 12px;">
+                <span></span><span></span><span></span>
+            </button>
             <a href="javascript:history.back()" class="btn-icon" style="margin-right: var(--space-md);">&larr;</a>
             <div style="display: flex; align-items: center; gap: 12px;">
                 <?php if($target_user['avatar']): ?>
@@ -70,6 +76,21 @@
                 const msgContainer = document.getElementById("messages-container");
                 if (msgContainer) {
                     msgContainer.scrollTop = msgContainer.scrollHeight;
+                }
+
+                // Mobile Sidebar Toggle
+                const menuBtn = document.getElementById('mobileMenuBtn');
+                const sidebar = document.querySelector('.l-app__sidebar');
+                const overlay = document.getElementById('mobileOverlay');
+
+                function toggleMenu() {
+                    sidebar.classList.toggle('is-open');
+                    overlay.classList.toggle('is-active');
+                }
+
+                if(menuBtn && sidebar && overlay) {
+                    menuBtn.addEventListener('click', toggleMenu);
+                    overlay.addEventListener('click', toggleMenu);
                 }
             });
         </script>

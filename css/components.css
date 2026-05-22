@@ -217,19 +217,17 @@
 
 /* Actual Bubble Structure */
 .chat-bubble {
-    padding: 14px 20px;
-    /* Highly padded, premium feel */
+    padding: clamp(10px, 2vw, 14px) clamp(14px, 3vw, 20px);
     border-radius: 20px;
-    font-size: 1rem;
+    font-size: clamp(0.95rem, 2vw, 1rem);
     line-height: var(--lh-relaxed);
     letter-spacing: -0.01em;
-    /* Subtle optical tightening */
-    word-wrap: break-word;
-    overflow-wrap: break-word;
+    word-break: break-word;
+    overflow-wrap: anywhere;
     hyphens: auto;
     box-shadow: var(--shadow-soft);
     min-width: 60px;
-    /* avoid squished short words */
+    max-width: 100%; /* Force containment */
 }
 
 .chat-bubble--self {
@@ -293,7 +291,7 @@
     bottom: 0;
     left: 0;
     width: 100%;
-    padding: var(--space-xl);
+    padding: clamp(0.5rem, 3vw, var(--space-xl));
     background: linear-gradient(to top, var(--c-bg-app) 75%, transparent);
     display: flex;
     justify-content: center;
@@ -303,15 +301,13 @@
 .chat-input-box {
     width: 100%;
     max-width: 768px;
-    /* Perfectly aligned to central column */
     background: white;
     border: 1px solid rgba(0, 0, 0, 0.06);
     border-radius: var(--radius-pill);
-    padding: 12px 14px 12px 24px;
-    /* Extravagant padding */
+    padding: clamp(8px, 1.5vw, 12px) clamp(12px, 2vw, 14px) clamp(8px, 1.5vw, 12px) clamp(16px, 3vw, 24px);
     display: flex;
     align-items: center;
-    gap: 12px;
+    gap: 8px;
     box-shadow: var(--shadow-floating);
     transition: all var(--duration-base) var(--ease-spring);
 }
@@ -387,7 +383,27 @@
     flex-direction: column;
     align-items: center;
     text-align: center;
-    padding: var(--space-2xl);
-    max-width: 400px;
     margin: auto;
+}
+
+/* ==========================================================================
+   Mobile Refinements
+   ========================================================================== */
+@media (max-width: 768px) {
+    .chat-input-box__field {
+        height: 36px;
+        line-height: 36px;
+    }
+    .modal-overlay > div {
+        width: 92% !important;
+        padding: var(--space-lg) !important;
+        max-height: 90vh;
+        overflow-y: auto;
+    }
+    .l-app__header h1, .l-app__header h2 {
+        font-size: var(--fs-md) !important;
+    }
+    .empty-state {
+        padding: var(--space-lg);
+    }
 }

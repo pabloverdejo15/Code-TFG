@@ -1,109 +1,269 @@
 /* ==========================================================================
-   Layout Architecture
+   Layout Architecture (Mobile First)
    ========================================================================== */
+
+/* Universal Reset & Box Sizing to prevent overflow */
+*, *::before, *::after {
+    box-sizing: border-box;
+    min-width: 0; /* Prevents flex children from blowing out */
+}
 
 /* The main Application Shell */
 .l-app {
     display: flex;
     flex-direction: column;
     height: 100vh;
-    width: 100vw;
+    height: 100dvh;
+    width: 100%; /* Avoids 100vw horizontal scrollbar bug */
     overflow: hidden;
+    background: var(--c-bg-app);
 }
 
-/* Tablet & Desktop Layout */
 @media (min-width: 768px) {
     .l-app {
         flex-direction: row;
     }
 }
 
-/* 1. Left Sidebar */
+/* 1. Global Left Sidebar (Off-canvas on mobile) */
 .l-app__sidebar {
-    flex: 0 0 80px;
-    /* Collapsed desktop default */
-    background-color: #F9FAFB;
-    /* Very subtle grey contrast */
-    border-right: 1px solid rgba(0, 0, 0, 0.06);
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 280px;
+    max-width: 85vw;
+    height: 100dvh;
+    background-color: var(--c-bg-app);
+    border-right: 1px solid var(--c-border);
     display: flex;
     flex-direction: column;
-    z-index: 10;
-    transition: flex var(--duration-base) var(--ease-spring);
+    z-index: 100;
+    transform: translateX(-100%);
+    transition: transform 0.3s cubic-bezier(0.4, 0, 0.2, 1);
 }
 
-@media (min-width: 1024px) {
+.l-app__sidebar.is-open {
+    transform: translateX(0);
+}
+
+@media (min-width: 768px) {
     .l-app__sidebar {
-        flex: 0 0 250px;
-        /* Expanded default */
+        position: static;
+        width: 80px; /* Collapsed mode for tablet/desktop */
+        height: 100%;
+        transform: none;
+        z-index: 10;
+        flex-shrink: 0;
     }
 }
 
-/* Top App Header (Search etc) */
-.l-app__header {
-    height: 72px;
-    /* Taller, breathable header */
+@media (min-width: 1200px) {
+    .l-app__sidebar {
+        width: 250px; /* Expanded mode for large desktop */
+    }
+}
+
+/* 1b. Secondary Left Sidebar (Channels list) */
+.l-app__secondary {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 280px;
+    max-width: 85vw;
+    height: 100dvh;
+    background-color: var(--c-bg-app);
+    border-right: 1px solid var(--c-border);
     display: flex;
-    align-items: center;
-    padding: 0 var(--space-xl);
-    background: var(--c-bg-app);
-    border-bottom: 1px solid rgba(0, 0, 0, 0.06);
-    z-index: 5;
-    flex-shrink: 0;
+    flex-direction: column;
+    z-index: 105; /* Superpone a l-app__sidebar en móvil */
+    transform: translateX(-100%);
+    transition: transform 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+.l-app__secondary.is-open {
+    transform: translateX(0);
+}
+
+@media (min-width: 768px) {
+    .l-app__secondary {
+        position: static;
+        flex: 0 0 260px !important;
+        width: 260px;
+        height: 100%;
+        transform: none;
+        z-index: 9;
+    }
+}
+
+/* Sidebar Overlay for mobile */
+.sidebar-overlay {
+    display: none;
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100dvh;
+    background: rgba(0, 0, 0, 0.5);
+    backdrop-filter: blur(4px);
+    -webkit-backdrop-filter: blur(4px);
+    z-index: 90;
+    opacity: 0;
+    transition: opacity 0.3s ease;
+}
+
+.sidebar-overlay.is-active {
+    display: block;
+    opacity: 1;
+}
+
+@media (min-width: 1200px) {
+    .sidebar-overlay {
+        display: none !important;
+    }
 }
 
 /* 2. Main Center Content */
 .l-app__main {
-    flex: 1;
     display: flex;
     flex-direction: column;
-    min-width: 0;
-    /* Important for flex child truncation */
+    flex: 1;
+    height: 100dvh;
+    min-width: 0; /* CRITICAL for Flexbox text-truncation and avoiding overflow */
     position: relative;
     background: var(--c-bg-app);
+}
+
+/* Top App Header */
+.l-app__header {
+    height: 72px;
+    display: flex;
+    align-items: center;
+    padding: 0 clamp(1rem, 3vw, var(--space-xl));
+    background: var(--c-bg-app);
+    border-bottom: 1px solid var(--c-border);
+    z-index: 5;
+    flex-shrink: 0;
+    width: 100%;
 }
 
 .l-app__content {
     flex: 1;
     overflow-y: auto;
-    padding: var(--space-xl);
+    overflow-x: hidden;
+    padding: clamp(1rem, 3vw, var(--space-xl));
     position: relative;
+    -webkit-overflow-scrolling: touch;
 }
 
-/* Chat Feed Constraint (Linear/Discord Narrow Column) */
+/* Chat Feed Constraint */
 .l-app__content.chat-feed {
-    padding-bottom: 140px;
-    /* Massive breathing room for float input */
+    padding-bottom: clamp(100px, 15vh, 140px);
 }
 
 .chat-container-inner {
+    width: 100%;
     max-width: 768px;
-    /* NARROW READABLE COLUMN */
     margin: 0 auto;
     display: flex;
     flex-direction: column;
-    padding: 0 var(--space-xl);
+    padding: 0;
 }
 
-/* 3. Context Right Sidebar */
+@media (min-width: 768px) {
+    .chat-container-inner {
+        padding: 0 var(--space-xl);
+    }
+}
+
+/* 3. Context Right Sidebar (Members drawer on mobile) */
 .l-app__context {
-    display: none;
-    flex: 0 0 300px;
-    /* Wider right sidebar */
-    background-color: #FAFAFA;
-    border-left: 1px solid rgba(0, 0, 0, 0.06);
+    position: fixed;
+    top: 0;
+    right: 0;
+    width: 280px;
+    max-width: 85vw;
+    height: 100dvh;
+    background-color: var(--c-bg-app);
+    border-left: 1px solid var(--c-border);
+    display: flex;
+    flex-direction: column;
+    z-index: 100;
+    transform: translateX(100%);
+    transition: transform 0.3s cubic-bezier(0.4, 0, 0.2, 1);
     overflow-y: auto;
+}
+
+.l-app__context.is-open {
+    transform: translateX(0);
 }
 
 @media (min-width: 1200px) {
     .l-app__context {
-        display: block;
+        position: static;
+        width: 300px;
+        flex-shrink: 0;
+        height: 100%;
+        transform: none;
+        z-index: 10;
+        display: flex;
     }
 }
 
 /* Layout Utilities */
 .l-grid-masonry {
     display: grid;
-    grid-template-columns: repeat(auto-fill, minmax(320px, 1fr));
-    gap: var(--space-xl);
+    grid-template-columns: repeat(auto-fill, minmax(min(100%, 280px), 1fr));
+    gap: clamp(1rem, 3vw, var(--space-xl));
     align-items: start;
+}
+
+/* Mobile Header Hamburger button styles */
+.hamburger-btn {
+    display: flex;
+    flex-direction: column;
+    justify-content: space-between;
+    width: 24px;
+    height: 18px;
+    background: transparent;
+    border: none;
+    cursor: pointer;
+    padding: 0;
+    margin-right: var(--space-md);
+    z-index: 101;
+    flex-shrink: 0;
+}
+
+.hamburger-btn span {
+    display: block;
+    width: 100%;
+    height: 2px;
+    background-color: var(--c-text-main);
+    border-radius: 2px;
+    transition: all 0.3s ease;
+}
+
+@media (min-width: 768px) {
+    .hamburger-btn {
+        display: none;
+    }
+}
+
+.mobile-context-btn {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    background: transparent;
+    border: none;
+    font-size: 1.2rem;
+    cursor: pointer;
+    padding: 8px;
+    color: var(--c-text-main);
+    z-index: 101;
+    flex-shrink: 0;
+}
+
+@media (min-width: 1200px) {
+    .mobile-context-btn {
+        display: none;
+    }
 }

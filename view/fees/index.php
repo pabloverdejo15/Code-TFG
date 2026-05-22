@@ -15,6 +15,9 @@
         <header class="l-app__header">
             <div style="display: flex; align-items: center; justify-content: space-between; width: 100%;">
                 <div style="display: flex; align-items: center;">
+                    <button class="hamburger-btn" id="mobileMenuBtn" aria-label="Abrir menú" style="margin-right: 12px;">
+                        <span></span><span></span><span></span>
+                    </button>
                     <div>
                         <h1 style="font-size: var(--fs-lg); font-weight: 600; color: var(--c-text-main);">Cuotas de Comunidad</h1>
                         <div style="font-size: var(--fs-xs); color: var(--c-text-muted);"><?php echo htmlspecialchars($community['nombre']); ?></div>

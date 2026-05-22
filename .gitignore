@@ -5,3 +5,4 @@ uploads/
 Thumbs.db
 .vscode/
 *.log
+.env

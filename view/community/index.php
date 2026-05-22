@@ -9,6 +9,11 @@
     
     <main class="l-app__main">
         <header class="l-app__header">
+            <button class="hamburger-btn" id="mobileMenuBtn" aria-label="Abrir menú">
+                <span></span>
+                <span></span>
+                <span></span>
+            </button>
             <h1 style="font-size: var(--fs-lg); font-weight: 600; color: var(--c-text-main);">Dashboard</h1>
         </header>
 
@@ -164,6 +169,7 @@
         </div>
     </main>
 </div>
+
 
 <!-- Simple Modals (Can be isolated later) -->
 <div id="createModal" style="display: none; position: fixed; top:0; left:0; width:100%; height:100%; background:rgba(17, 24, 39, 0.7); align-items: center; justify-content: center; z-index: 100;">

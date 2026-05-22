@@ -19,12 +19,16 @@
             <!-- Sticky Glass Header -->
             <header class="l-app__header" style="justify-content: space-between; border-bottom: 1px solid var(--c-border); position: absolute; width: 100%; top: 0; z-index: 10;">
                 <div style="display: flex; align-items: center; gap: 12px;">
+                    <button class="hamburger-btn" id="mobileMenuBtn" aria-label="Abrir menú" style="margin-right: 8px;">
+                        <span></span><span></span><span></span>
+                    </button>
                     <span style="font-size: 1.5rem; color: var(--c-text-muted); font-weight: 300;">#</span>
                     <div>
                         <h2 style="font-size: var(--fs-md); font-weight: 600; color: var(--c-text-main); margin-bottom: 2px;"><?php echo htmlspecialchars($current_channel['nombre']); ?></h2>
                         <div style="font-size: var(--fs-xs); color: var(--c-text-muted);"><?php echo htmlspecialchars($current_channel['descripcion']); ?></div>
                     </div>
                 </div>
+                <button class="mobile-context-btn" id="mobileMembersBtn" title="Ver vecinos">👥</button>
             </header>
 
             <!-- Scrollable Message Feed -->

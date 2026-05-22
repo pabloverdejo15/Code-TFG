@@ -80,6 +80,12 @@ body, .l-app {
     padding: 0 var(--space-2xl) !important;
 }
 
+@media (max-width: 767px) {
+    .chat-container-inner {
+        padding: 0 var(--space-sm) !important;
+    }
+}
+
 .chat-input-area {
     background: linear-gradient(to top, var(--c-bg-app) 75%, transparent) !important;
     width: 100% !important;
@@ -91,6 +97,7 @@ body, .l-app {
     max-width: none !important;
     width: 100% !important;
     border-radius: 16px !important;
+    box-sizing: border-box !important;
 }
 
 .chat-input-box:focus-within {

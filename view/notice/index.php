@@ -15,6 +15,9 @@
         <header class="l-app__header">
             <div style="display: flex; align-items: center; justify-content: space-between; width: 100%;">
                 <div style="display: flex; align-items: center;">
+                    <button class="hamburger-btn" id="mobileMenuBtn" aria-label="Abrir menú" style="margin-right: 12px;">
+                        <span></span><span></span><span></span>
+                    </button>
                     <a href="<?php echo BASE_URL; ?>?controller=Channel&action=index&community_id=<?php echo $community['id_comunidad']; ?>&<?php echo SID; ?>" class="btn-icon" style="margin-right: var(--space-md);">
                         &larr;
                     </a>

@@ -773,4 +773,50 @@ input.form__field:invalid {
     color: var(--c-text-muted, #9ca3af);
     text-align: right;
     flex-shrink: 0;
+}
+
+/* ============================================================
+   RESPONSIVE BASE ADJUSTMENTS
+   ============================================================ */
+@media (max-width: 767px) {
+    .auth-container,
+    .auth-container-dark,
+    .glass-panel {
+        padding: 1.5rem !important;
+        width: 90% !important;
+        margin: 1rem auto !important;
+        box-sizing: border-box;
+    }
+    
+    .container {
+        padding: 1.5rem;
+        width: 90%;
+        box-sizing: border-box;
+    }
+    
+    .message-card {
+        max-width: 95%;
+    }
+    
+    .messages-area {
+        padding: 1rem;
+    }
+    
+    .chat-header {
+        padding: 0 1rem;
+    }
+    
+    .input-area {
+        padding: 1rem;
+    }
+    
+    /* Prevents automatic zoom on iOS Safari */
+    input[type="text"],
+    input[type="email"],
+    input[type="password"],
+    input.form__field,
+    textarea,
+    select {
+        font-size: max(16px, 1rem) !important;
+    }
 }
